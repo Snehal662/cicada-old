@@ -13,6 +13,7 @@ const ToastContext = React.createContext({
 })
 
 export function useToast() {
+  console.log(ToastContext)
   return React.useContext(ToastContext)
 }
 

@@ -31,7 +31,7 @@ const MatrixRain = () => {
         const y = drops[i] * fontSize;
 
         // Brighter at the head of the drop
-        const gradient = ctx.createLinearGradient(x, y - fontSize * 10, x, y);
+        const gradient = ctx.createLinearGradient(x, y - fontSize * 5, x, y);
         gradient.addColorStop(0, 'rgba(0, 255, 0, 0)');
         gradient.addColorStop(0.5, 'rgba(0, 255, 0, 0.5)');
         gradient.addColorStop(1, 'rgba(0, 255, 0, 1)');

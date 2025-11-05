@@ -1,54 +1,65 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '../components/ui/dialog';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Button } from '../components/ui/button';
-import { useToast } from '../components/ui/use-toast';
+} from "../components/ui/dialog";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Button } from "../components/ui/button";
+import { useUserStore } from "../store/user";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const AuthModal = ({ isOpen, onClose, mode, onToggleMode }) => {
-  const { toast } = useToast();
-
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
   // Common fields
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { setUser, user } = useUserStore();
   // Signup fields
-  const [teamName, setTeamName] = useState('');
-  const [leaderName, setLeaderName] = useState('');
-  const [leaderEmail, setLeaderEmail] = useState('');
-  const [member1Name, setMember1Name] = useState('');
-  const [member1Email, setMember1Email] = useState('');
-  const [member2Name, setMember2Name] = useState('');
-  const [member2Email, setMember2Email] = useState('');
+  const [teamName, setTeamName] = useState("");
+  const [leaderName, setLeaderName] = useState("");
+  const [leaderEmail, setLeaderEmail] = useState("");
+  const [member1Name, setMember1Name] = useState("");
+  const [member1Email, setMember1Email] = useState("");
+  const [member2Name, setMember2Name] = useState("");
+  const [member2Email, setMember2Email] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    if (mode === 'signin') {
-      console.log('Sign in attempt:', { email, password });
-      toast({
-        title: 'Signing in...',
-        description: 'Authenticating your credentials.',
-      });
+    if (mode === "signin") {
+      try {
+        const res = await fetch("/api/team/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ leader_email: email, password }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.err || "Login failed");
+        localStorage.setItem("Team", JSON.stringify(data));
+        setUser(data);
+        toast.success("Logged in successfully!");
+        navigate("/play");
+        onClose();
+      } catch (err) {
+        setError(err.message || "Login failed. Please try again.");
+      }
     } else {
-      // Validation for JUET emails
-      const juetPattern = /@juetguna\.in$/;
+      const juetPattern = /^[^@]+@juetguna\.in$/i;
       if (
         !juetPattern.test(leaderEmail) ||
         !juetPattern.test(member1Email) ||
         !juetPattern.test(member2Email)
       ) {
-        toast({
-          title: 'Invalid email',
-          description: 'All emails must end with @juetguna.in',
-          variant: 'destructive',
-        });
+        setError("All emails must end with @juetguna.in");
         return;
       }
 
@@ -59,52 +70,64 @@ const AuthModal = ({ isOpen, onClose, mode, onToggleMode }) => {
         !member1Name ||
         !member1Email ||
         !member2Name ||
-        !member2Email
+        !member2Email ||
+        !password
       ) {
-        toast({
-          title: 'Missing fields',
-          description: 'Please fill out all required fields.',
-          variant: 'destructive',
-        });
+        setError("Please fill out all required fields.");
         return;
       }
 
-      console.log('Signup attempt:', {
-        teamName,
-        leaderName,
-        leaderEmail,
-        member1Name,
-        member1Email,
-        member2Name,
-        member2Email,
-      });
+      try {
+        const res = await fetch("/api/team/signup", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            team_name: teamName,
+            leader_name: leaderName,
+            leader_email: leaderEmail,
+            member1_name: member1Name,
+            member1_email: member1Email,
+            member2_name: member2Name,
+            member2_email: member2Email,
+            password,
+          }),
+        });
 
-      toast({
-        title: 'Registration successful!',
-        description: 'Your team has been registered successfully.',
-      });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.err || "Signup failed");
+        localStorage.setItem("Team", JSON.stringify(data));
+        setUser(data);
+        toast.success("Welcome aboard! Team registered successfully.");
+        navigate("/play");
+        onClose();
+      } catch (err) {
+        setError(err.message || "Signup failed. Please try again.");
+      }
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl bg-gray-900 border-green-500/50 shadow-2xl max-h-[85vh] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-green-500/50 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-green-500/70 [&>button]:text-green-400 [&>button]:hover:text-green-300 [&>button]:hover:bg-green-500/10">
+      <DialogContent className="sm:max-w-xl bg-gray-900 border-green-500/50 shadow-2xl max-h-[85vh] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-green-500/50 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-green-500/70 [&>button]:text-green-400 [&>button]:hover:text-green-300 [&>button]:hover:bg-green-500/10">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold font-mono text-center text-green-400">
-            {mode === 'signin' ? 'Decode Access' : 'Join the Hunt'}
+            {mode === "signin" ? "Decode Access" : "Join the Hunt"}
           </DialogTitle>
           <DialogDescription className="text-center text-gray-400">
-            {mode === 'signin'
-              ? 'Enter your credentials to continue'
-              : 'Register your team to start solving mysteries'}
+            {mode === "signin"
+              ? "Enter your credentials to continue"
+              : "Register your team to start solving mysteries"}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
-          {mode === 'signin' ? (
+          {mode === "signin" ? (
             <>
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-green-400">Email</Label>
+                <Label htmlFor="email" className="text-green-400">
+                  Email
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -116,7 +139,9 @@ const AuthModal = ({ isOpen, onClose, mode, onToggleMode }) => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-green-400">Password</Label>
+                <Label htmlFor="password" className="text-green-400">
+                  Password
+                </Label>
                 <Input
                   id="password"
                   type="password"
@@ -130,16 +155,35 @@ const AuthModal = ({ isOpen, onClose, mode, onToggleMode }) => {
             </>
           ) : (
             <>
-              {/* Team Name - Full Width */}
-              <div className="space-y-2">
-                <Label className="text-green-400 font-semibold">Team Name</Label>
-                <Input
-                  placeholder="The Enigmas"
-                  value={teamName}
-                  onChange={(e) => setTeamName(e.target.value)}
-                  className="bg-gray-800 border-green-500/50 focus:border-green-500 text-green-400 placeholder:text-gray-600 transition-all"
-                  required
-                />
+              {/* Team Name and Password */}
+              <div className="flex justify-center">
+                <div className="flex gap-4">
+                  <div className="flex-1 space-y-2">
+                    <Label className="text-green-400 font-semibold">
+                      Team Name
+                    </Label>
+                    <Input
+                      placeholder="The Enigmas"
+                      value={teamName}
+                      onChange={(e) => setTeamName(e.target.value)}
+                      className="bg-gray-800 border-green-500/50 focus:border-green-500 text-green-400 placeholder:text-gray-600 transition-all"
+                      required
+                    />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <Label className="text-green-400 font-semibold">
+                      Password
+                    </Label>
+                    <Input
+                      placeholder="Enter Password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="bg-gray-800 border-green-500/50 focus:border-green-500 text-green-400 placeholder:text-gray-600 transition-all"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Leader Section */}
@@ -234,17 +278,24 @@ const AuthModal = ({ isOpen, onClose, mode, onToggleMode }) => {
             </>
           )}
 
+          {/* ⚠️ Error message here */}
+          {error && (
+            <p className="text-red-500 text-sm font-medium text-center -mt-2">
+              {error}
+            </p>
+          )}
+
           <Button
             type="submit"
             className="w-full bg-green-500 hover:bg-green-600 text-black font-semibold shadow-lg shadow-green-500/20 hover:shadow-green-500/40 transition-all duration-300"
           >
-            {mode === 'signin' ? 'Sign In' : 'Register Team'}
+            {mode === "signin" ? "Sign In" : "Register Team"}
           </Button>
 
           <div className="text-center text-sm text-gray-400">
-            {mode === 'signin' ? (
+            {mode === "signin" ? (
               <>
-                Don't have an account?{' '}
+                Don't have an account?{" "}
                 <button
                   type="button"
                   onClick={onToggleMode}
@@ -255,7 +306,7 @@ const AuthModal = ({ isOpen, onClose, mode, onToggleMode }) => {
               </>
             ) : (
               <>
-                Already registered?{' '}
+                Already registered?{" "}
                 <button
                   type="button"
                   onClick={onToggleMode}

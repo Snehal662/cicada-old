@@ -1,32 +1,25 @@
-import Navbar from '../components/Navbar.jsx';
-import MatrixRain from '../components/MatrixRain.jsx';
-import BackgroundEffects from '../components/BackgroundEffects.jsx';
+import Navbar from "../components/Navbar.jsx";
+import MatrixRain from "../components/MatrixRain.jsx";
+import BackgroundEffects from "../components/BackgroundEffects.jsx";
+import cicadaBg from "../assets/cicada-bg.png";
 
 function Home() {
   return (
     <div className="relative min-h-screen bg-black overflow-hidden">
-      {/* Matrix rain effect */}
       <MatrixRain />
-
-      {/* Background image */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-20"
-        style={{ backgroundImage: 'url("/ciad.png")' }}
+        className="fixed inset-0 opacity-20 bg-center bg-no-repeat bg-contain"
+        style={{ backgroundImage: `url(${cicadaBg})`, zIndex: 1 }}
       />
-
-      {/* Background effects */}
       <BackgroundEffects />
-
-      {/* Navbar */}
       <Navbar />
 
-      {/* Main content */}
+
       <main className="relative z-10 flex items-center justify-center min-h-screen px-4">
         <div className="text-center space-y-8 max-w-4xl mx-auto pt-20 animate-fade-in">
-          {/* Subtitle / Message */}
-          <p className="text-xl md:text-2xl text-gray-300 font-mono max-w-2xl mx-auto leading-relaxed whitespace-pre-line">
-            {'\n\n'}
-            Epiphany is upon you. Your pilgrimage has begun.{' '}
+          <p className="text-xl md:text-2xl text-gray-300 font-mono max-w-2xl mx-auto leading-relaxed">
+            {/* {"\n\n"} whitespace-pre-line */}
+            Epiphany is upon you. Your pilgrimage has begun.{" "}
             <span className="text-green-400">Enlightenment awaits.</span>
           </p>
 
@@ -38,19 +31,21 @@ function Home() {
                 <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
                 <div className="w-3 h-3 rounded-full bg-green-500/50" />
               </div>
-              <span className="text-xs text-gray-500 font-mono">cicada_terminal</span>
+              <span className="text-xs text-gray-500 font-mono">
+                cicada_terminal
+              </span>
             </div>
             <div className="space-y-2 font-mono text-sm">
               <div className="text-green-400">
-                <span className="text-cyan-400">$</span> status:{' '}
+                <span className="text-cyan-400">$</span> status:{" "}
                 <span className="text-green-300">ACTIVE</span>
               </div>
               <div className="text-green-400">
-                <span className="text-cyan-400">$</span> puzzles_available:{' '}
+                <span className="text-cyan-400">$</span> puzzles_available:{" "}
                 <span className="text-green-300">7</span>
               </div>
               <div className="text-green-400">
-                <span className="text-cyan-400">$</span> solvers_online:{' '}
+                <span className="text-cyan-400">$</span> solvers_online:{" "}
                 <span className="text-green-300 animate-pulse">∞</span>
               </div>
             </div>
