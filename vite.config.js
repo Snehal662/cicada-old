@@ -6,12 +6,9 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [tailwindcss(),react()],
   server:{
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'https://cicada-backend.onrender.com/',
-        changeOrigin: true
-      }
-    },
+    port: 3000
   }
 })
+
+
+// target: 'https://cicada-backend.onrender.com/',

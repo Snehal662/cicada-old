@@ -71,7 +71,10 @@ const Play = () => {
   }, [navigate]);
 
   const handlePlayLevel = (level) => {
-    navigate(`/level${level}`);
+    // wait for 5sec then navigate
+    setTimeout(() => {
+      navigate(`/level${level}`);
+    }, 500);
   };
 
   const levelPositions = [
@@ -94,10 +97,6 @@ const Play = () => {
       />
 
       <div className="relative z-10 pt-24 px-4">
-        <p className="text-3xl font-bold text-center mb-8 text-green-400 font-mono sticky top-20 backdrop-blur-sm py-4 z-20 w-full">
-          SELECT LEVEL
-        </p>
-
         <div
           className="relative w-full max-w-4xl mx-auto"
           style={{ height: "200vh" }}

@@ -35,7 +35,7 @@ const AuthModal = ({ isOpen, onClose, mode, onToggleMode }) => {
 
     if (mode === "signin") {
       try {
-        const res = await fetch("/api/team/login", {
+        const res = await fetch("https://cicada-backend.onrender.com/api/team/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -78,7 +78,7 @@ const AuthModal = ({ isOpen, onClose, mode, onToggleMode }) => {
       }
 
       try {
-        const res = await fetch("/api/team/signup", {
+        const res = await fetch("https://cicada-backend.onrender.com/api/team/signup", {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
